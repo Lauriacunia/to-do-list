@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Tarea from './components/Tarea';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons'
 
 const App = () => {
   const [valorDelInput, setValorDelInput] = useState('');
+  const  [mostarTarea, setMostarTarea] = useState(true);
+  const  [mostarError, setMostarError] = useState(false);
   const [lista, setLista] = useState([
     'Lavar ropa',
     'Corregir TPS',
@@ -16,17 +16,34 @@ const App = () => {
   ])
 
 
-  const borrarElementoDelArray = (param) => {
-    // aqui borramos un elemento del array
-    console.log("estoy en la funcion borrar elemento del array y el parametro que me mandaron es", param)
+  const borrarElementoDelArray = (indice) => {
+
+    const nuevaLista = [...lista ]
+    nuevaLista.splice(indice, 1) // borra el elemento por su indice
+    console.log(nuevaLista)
+    setLista(nuevaLista)
+
+   // setLista([...lista].filter(elemento => elemento !== tarea)  // si pasase tarea como param
+  }
+
+  const modificarElementoDelArray = (tareaNueva, id) => {
+    console.log(tareaNueva, id)
+    const nuevaLista = [...lista ]
+    nuevaLista.splice(id, 1, tareaNueva) // borra el elemento por su indice y en su lugar agrega la nueva tarea
+    console.log(nuevaLista)
+    setLista(nuevaLista)
+
   }
 
   const handleClick = () => {
-    setLista([ ...lista, valorDelInput ]) // a fuego guardarse esto
-    setValorDelInput("")
+    valorDelInput && setLista([ ...lista, valorDelInput ]) // crea una copia segura del array original 
+    // y le agrega en nuevo input de la nueva tarea
+    valorDelInput || setMostarError(true)
+    setValorDelInput("") // reseatea el input
   };
 
   const handleChange = e => {
+    setMostarError(false)
     // en la funcion setState se pasa *el nuevo valor de la variabke*
     setValorDelInput(e.target.value);
   };
@@ -39,14 +56,15 @@ const App = () => {
 
   return (
     <div>
-    {/* <FontAwesomeIcon icon={faStar} /> */}
 
       <ul>
         {lista.map((tarea, i) => (
-          <Tarea 
+          mostarTarea && <Tarea 
             key={i} 
+            id={i}
             tarea={tarea} 
             borrarElementoDelArray={borrarElementoDelArray}
+            modificarElementoDelArray={modificarElementoDelArray}
             />
         ))}
       </ul>
@@ -61,6 +79,7 @@ const App = () => {
         />
       </label>
       <button onClick={handleClick}>Agregar tarea</button>
+      {mostarError && <h3>No podes ingresar una lista vacía</h3>}
     </div>
   );
 };
